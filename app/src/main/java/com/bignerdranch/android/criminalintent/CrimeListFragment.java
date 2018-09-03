@@ -3,6 +3,7 @@ package com.bignerdranch.android.criminalintent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,13 +25,26 @@ import java.util.List;
 //View chapter 8 to review everything here.
 public class CrimeListFragment extends Fragment {
 
+    private static final String SUBTITLE_VISIBILITY = "subtitle";
+
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
+    private boolean mSubtitleVisible;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+
+        if(savedInstanceState != null){
+            savedInstanceState.getBoolean(SUBTITLE_VISIBILITY, false);
+        }
+
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle instanceState){
+        instanceState.putBoolean(SUBTITLE_VISIBILITY, mSubtitleVisible);
     }
 
     @Override
@@ -49,6 +63,13 @@ public class CrimeListFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_crime_list, menu);
+
+        MenuItem item = menu.findItem(R.id.show_subtitle);
+        if(mSubtitleVisible){
+            item.setTitle(R.string.hied_subtitle);
+        } else {
+            item.setTitle(R.string.show_subtitle);
+        }
     }
 
     @Override
@@ -59,6 +80,11 @@ public class CrimeListFragment extends Fragment {
                 CrimeLab.get(getActivity()).add(crime);
                 Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getID());
                 startActivity(intent);
+                return true;
+            case R.id.show_subtitle:
+                mSubtitleVisible = !mSubtitleVisible;
+                getActivity().invalidateOptionsMenu();
+                updateSubtitle();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -81,6 +107,22 @@ public class CrimeListFragment extends Fragment {
         else{
             mAdapter.notifyDataSetChanged();
         }
+
+        updateSubtitle();
+    }
+
+    private void updateSubtitle(){
+        CrimeLab crimeLab = CrimeLab.get(getActivity());
+        int crimeCount = crimeLab.getCrimes().size();
+        String subtitle = getString(R.string.subtitle_format, crimeCount);
+
+        if(!mSubtitleVisible){
+            subtitle = null;
+        }
+
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.getSupportActionBar().setSubtitle(subtitle);
+
     }
 
     private class NormalCrimeHolder extends CrimeHolder{
