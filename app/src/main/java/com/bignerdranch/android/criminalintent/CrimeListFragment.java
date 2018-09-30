@@ -105,6 +105,7 @@ public class CrimeListFragment extends Fragment {
             mCrimeRecyclerView.setAdapter(mAdapter);
         }
         else{
+            mAdapter.setCrimes(crimes);
             mAdapter.notifyDataSetChanged();
         }
 
@@ -187,10 +188,10 @@ public class CrimeListFragment extends Fragment {
         @Override
         public CrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            switch (viewType){
-                case 0: return new NormalCrimeHolder(layoutInflater, parent);
-                case 1: return new NormalCrimeHolder(layoutInflater, parent);//return new SeriousCrimeHolder(layoutInflater, parent); Uncomment this line to add the Call 911 functionality.
-            }
+//            switch (viewType){
+//                case 0: return new NormalCrimeHolder(layoutInflater, parent);
+//                case 1: return new NormalCrimeHolder(layoutInflater, parent);//return new SeriousCrimeHolder(layoutInflater, parent); Uncomment this line to add the Call 911 functionality.
+//            }
             return new NormalCrimeHolder(layoutInflater, parent);
         }
 
@@ -205,11 +206,15 @@ public class CrimeListFragment extends Fragment {
             return mCrimes.size();
         }
 
-        @Override
-        public int getItemViewType(int position){
-           if(mCrimes.get(position).isRequiresPolice())
-               return 1;
-           else return 0;
+        public void setCrimes(List<Crime> crimes){
+            mCrimes = crimes;
         }
+
+//        @Override
+//        public int getItemViewType(int position){
+//           if(mCrimes.get(position).isRequiresPolice())
+//               return 1;
+//           else return 0;
+//        }
     }
 }
